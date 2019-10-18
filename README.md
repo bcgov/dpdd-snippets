@@ -3,7 +3,7 @@
 # dsab-snippets
 
 
-A home for [R](https://www.r-project.org/) scripts & snippets supporting various [Data Science & Analytics (OCIO) ](https://github.com/orgs/bcgov/teams/dsab) workflows.
+A home for [R](https://www.r-project.org/) scripts & snippets supporting various [Data Science & Analytics Branch (OCIO) ](https://github.com/orgs/bcgov/teams/dsab) workflows.
 
 
 ### Getting Help or Reporting an Issue
