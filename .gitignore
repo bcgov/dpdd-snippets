@@ -5,3 +5,5 @@
 .DS_Store
 *html
 *pdf
+/yvr-crime/data
+/yvr-crime/tmp
