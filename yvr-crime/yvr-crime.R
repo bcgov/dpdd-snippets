@@ -33,7 +33,7 @@ if(env_prime){
   library(colorRamps)
   source('functions.R')
   #update file path to find crime data
-  dat = read.csv('crimedata_csv_all_years.csv')
+  dat = read.csv('yvr-crime/data/crimedata_csv_all_years.csv')
   #NOTE1: HUNDRED_BLOCK = X NK_LOC ST is default location value used for incidents with unknown location and is geolocated to 312 Main Street
   # which is X = 492757.5, Y = 5458792
   # The number of instances in which this occurs is 2476/619474 ~ 0.4%, and is mostly prior to 2006.
