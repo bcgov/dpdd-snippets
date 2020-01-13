@@ -36,12 +36,12 @@ if(env_prime){
   dat = read.csv('yvr-crime/data/crimedata_csv_all_years.csv')
   #NOTE1: HUNDRED_BLOCK = X NK_LOC ST is default location value used for incidents with unknown location and is geolocated to 312 Main Street
   # which is X = 492757.5, Y = 5458792
-  # The number of instances in which this occurs is 2476/619474 ~ 0.4%, and is mostly prior to 2006.
+  # The number of instances in which this occurs is ~ 0.4%, and is mostly prior to 2006.
   # Because all of this analysis depends on location and region, they are removed. Run next two comments to verify the above.
   # length(dat[dat[,"HUNDRED_BLOCK"]=="X NK_LOC ST",1])
   # table(dat[dat[,"HUNDRED_BLOCK"]=="X NK_LOC ST",c("TYPE", "YEAR")])
   dat = dat[dat[,"HUNDRED_BLOCK"]!="X NK_LOC ST",]
-  #NOTE2: There are 62098 remaining instances (~10%) which have no location or neighbourhoood data due to privacy, mostly of types "Offence Against a Person"
+  #NOTE2: There are ~10% remaining instances which have no location or neighbourhoood data due to privacy, mostly of types "Offence Against a Person"
   # and "Homicide". In fact, all instances of these types have no location data. Unfortunately, these types are likely highly relavent to the analysis of the DTES,
   #but the policy is to withhold this information for these types. They are removed for now, unless a better handling method is thought of for the future.
   #Run the next comment line to see this table
@@ -49,7 +49,7 @@ if(env_prime){
   dat = dat[dat[,"NEIGHBOURHOOD"]!="",]
   CATEGORY = rep(0, times=length(dat[,1]))
   dat = cbind(dat, CATEGORY)
-  #ESTIMATED DEFINITION FOR DTES 
+  #ESTIMATED DEFINITION FOR DTES
   x_min = 491900 #Approx. x-coord. of Homer St. @ Pender
   x_max = 493360 #Approx. x-coord. of Princess Ave.
   y_min = 5458630 #Approx. y-coord of Pender St.
@@ -82,8 +82,7 @@ ggplot(data = as.data.frame(as_proportion(dat)))+
   xlab("Year")+
   ylab("Proportion")
 
-#Heatmap plot - all yvr-crime: shows a lot of density in CBD outside of the DTES, making the claim that the DTES is the driving force behid
-#the increase in proportion in the CBD shown above suspicious
+#Heatmap plot - all yvr-crime: shows a lot of density in CBD outside of the DTES
 ggplot(data = dat[dat[,'X']>480000&dat[,"X"]<500000,])+
   stat_bin2d(mapping = aes(x = X, y = Y), bins=150)+
   scale_fill_gradientn(colours=colorRamps::matlab.like2(50))
@@ -94,7 +93,6 @@ ggplot(data = dat[dat$CATEGORY=="DTES",])+
   scale_fill_gradientn(colours=colorRamps::matlab.like2(50))
 
 #plot - proportion plot as before, but using an alternate grouping isolating the DTES as in the previous heatmap
-#shows that the increase in proportion of crime in the DTES is not significantly different than in the areas surrounding it..
 ggplot(data = as.data.frame(as_proportion(data=dat[dat[,"YEAR"]>2011,], groups='CATEGORY')))+
   geom_line(mapping = aes(x = YEAR, y = Freq, group = CATEGORY, color = CATEGORY))+
   ggtitle("Proportion of Recorded Crime Instances In Regions Over Time")+
