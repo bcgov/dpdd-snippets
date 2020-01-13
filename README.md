@@ -1,14 +1,14 @@
 <a id="devex-badge" rel="Exploration" href="https://github.com/BCDevExchange/assets/blob/master/README.md"><img alt="Being designed and built, but in the lab. May change, disappear, or be buggy." style="border-width:0" src="https://assets.bcdevexchange.org/images/badges/exploration.svg" title="Being designed and built, but in the lab. May change, disappear, or be buggy." /></a>[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-# dsab-snippets
+# dpdd-snippets
 
 
-A home for [R](https://www.r-project.org/) scripts & snippets supporting various [Data Science & Analytics Branch (OCIO) ](https://github.com/orgs/bcgov/teams/dsab) workflows.
+A home for [R](https://www.r-project.org/) scripts & snippets supporting various [Digital Platforms & Data Division Data Science Team (OCIO) ](https://github.com/orgs/bcgov/teams/dsab) workflows.
 
 
 ### Getting Help or Reporting an Issue
 
-To report bugs/issues/feature requests, please file an [issue](https://github.com/bcgov/dsab-snippets/issues/).
+To report bugs/issues/feature requests, please file an [issue](https://github.com/bcgov/dpdd-snippets/issues/).
 
 ### How to Contribute
 
@@ -33,7 +33,7 @@ See the License for the specific language governing permissions and limitations 
 ```
 
 
-This repository is maintained by [Data Science & Analytics Branch (OCIO) ](https://github.com/orgs/bcgov/teams/dsab).
+This repository is maintained by [Data Science Partnerships Team (DPDD, OCIO)](https://github.com/orgs/bcgov/teams/dsp).
 
 ---
 *This project was created using the [bcgovr](https://github.com/bcgov/bcgovr) package.* 
