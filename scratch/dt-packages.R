@@ -11,7 +11,7 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 
-## Load libraries
+## Load libraries ------------------------------------------------------------
 library(dplyr)
 library(tictoc) #timing
 library(data.table)
@@ -19,10 +19,14 @@ library(dtplyr)
 library(tidyfast) #https://github.com/TysonStanley/tidyfast
 library(tidydt) #https://github.com/markfairbanks/tidydt
 library(conflicted)
+library(microbenchmark)
+library(ggplot2)
+library(patchwork)
 
+# conflict_prefer("filter", "dplyr")
 
-## make some fake, biggish data
-number_of_rows <- 1E8 ## increase this to really test things
+## make a fake, biggish data data frame --------------------------------------
+number_of_rows <- 1E8 #increase this to really test things
 
 fake_data <- data.frame(sample(1:100, number_of_rows, replace = TRUE),
                        sample(seq(as.Date('1990/01/01'), as.Date('2010/01/01'), by = "day"),
@@ -33,28 +37,75 @@ fake_data <- data.frame(sample(1:100, number_of_rows, replace = TRUE),
 colnames(fake_data) <- c("some_number", "date", "some_letter", "gender")
 
 
-## in memory dplyr test ----------------------------------------------------
-tic()
-fake_data %>%
-  dplyr::filter(date > as.Date("1999-12-31")) %>%
-  group_by(gender, some_letter) %>%
-  summarise(mean_age = mean(some_number), sum_age = sum(some_number))
-toc()
+## make dtplyr and data.table and other data objects ------------------------
+fake_data_dtplyr <- lazy_dt(fake_data) #dtplyr
+fake_data_dt <- as.data.table(fake_data) #data.table
+fake_data_tidydt <- as_dt(fake_data) #tidydt
 
 
-## in memory dtplyr test ----------------------------------------------------
-tic()
-fake_data %>%
-  dplyr::filter(date > as.Date("1999-12-31")) %>%
-  group_by(gender, some_letter) %>%
-  summarise(mean_age = mean(some_number), sum_age = sum(some_number))
-toc()
+## microbenching filter & summarise -----------------------------------------
 
-## in memory data.table test -----------------------------------------------
+#filter & summarizing
+compare_filter_summarize <- microbenchmark("dplyr" = {
+  fake_data %>%
+    dplyr::filter(date > as.Date("1999-12-31")) %>%
+    group_by(gender, some_letter) %>%
+    summarise(mean_age = mean(some_number),
+              sum_age = sum(some_number))
+},
+"dtplyr" = {
+  fake_data_dtplyr %>%
+    dplyr::filter(date > as.Date("1999-12-31")) %>%
+    group_by(gender, some_letter) %>%
+    summarise(mean_age = mean(some_number),
+              sum_age = sum(some_number)) %>%
+  as_tibble()
+},
+"data.table" = {
+  fake_data_dt[date > as.Date("1999-12-31"), .(mean_age = mean(some_number),
+    sum_age = sum(some_number)), by = .(gender, some_letter)]
+},
+"tidydt" = {
+  fake_data_tidydt %>%
+  dt_filter(date > as.Date("1999-12-31")) %>%
+  dt_summarise(mean_age = mean(some_number), sum_age = sum(some_number),
+               by = list(gender, some_letter))
+})
+compare_filter_summarize
 
-fake_data_dt = as.data.table(fake_data)
+#plot speeds
+hundred_million <- autoplot(compare_filter_summarize)
 
-tic()
-fake_data_dt[date > as.Date("1999-12-31"), mean_age = mean(some_number),
-             sum_age = sum(some_number), by = gender, some_number]
-toc()
+#compare plots
+p1 <- one_thousand + labs(title = "1 x thousand rows")
+p2 <- ten_thousand + labs(title = "10 x thousand rows")
+p3 <- hundred_thousand + labs(title = "100 x thousand rows")
+p4 <- one_million + labs(title = "1 x million rows")
+p5 <- ten_million + labs(title = "10 x million rows")
+p6 <- hundred_million + labs(title = "100 x million rows")
+
+plot <- p1 + p2 + p3 + p4 + p5 + p6
+
+ggsave("out/dt-packages.png", plot)
+
+
+## microbenching case_when ---------------------------------------------------
+compare_case_when <- microbenchmark("dplyr" = {
+
+},
+"dtplyr" = {
+
+},
+"data.table" = {
+
+},
+"tidydt" = {
+
+})
+compare_case_when
+
+#plot speeds
+autoplot(compare_case_when)
+
+
+
