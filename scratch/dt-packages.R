@@ -74,19 +74,22 @@ compare_filter_summarize <- microbenchmark("dplyr" = {
 compare_filter_summarize
 
 #plot speeds
-hundred_million <- autoplot(compare_filter_summarize)
+p6 <- autoplot(compare_filter_summarize, log = FALSE)
+
+# boxplot(compare_filter_summarize, log = FALSE,
+#         horizontal = TRUE)
 
 #compare plots
-p1 <- one_thousand + labs(title = "1 x thousand rows")
-p2 <- ten_thousand + labs(title = "10 x thousand rows")
-p3 <- hundred_thousand + labs(title = "100 x thousand rows")
-p4 <- one_million + labs(title = "1 x million rows")
-p5 <- ten_million + labs(title = "10 x million rows")
-p6 <- hundred_million + labs(title = "100 x million rows")
+p1 <- p1 + labs(title = "1 x thousand")
+p2 <- p2 + labs(title = "10 x thousand")
+p3 <- p3 + labs(title = "100 x thousand")
+p4 <- p4 + labs(title = "1 x million")
+p5 <- p5 + labs(title = "10 x million")
+p6 <- p6 + labs(title = "100 x million")
 
 plot <- p1 + p2 + p3 + p4 + p5 + p6
 
-ggsave("out/dt-packages.png", plot)
+ggsave("out/dt-packages_nolog.png", plot)
 
 
 ## microbenching case_when ---------------------------------------------------
