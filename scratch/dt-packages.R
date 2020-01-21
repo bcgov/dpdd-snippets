@@ -21,12 +21,20 @@ library(tidydt) #https://github.com/markfairbanks/tidydt
 library(conflicted)
 library(microbenchmark)
 library(ggplot2)
+library(purrr)
 library(patchwork)
 
 # conflict_prefer("filter", "dplyr")
 
+sizes <- c(1E3, 1E4, 1E5, 1E6, 1E7, 1E8)
+names <- c("1 x thousand", "10 x thousand", "100 x thousand",
+           "1 x million", "10 x million", "100 x million")
+df <- data.frame(sizes, names)
+
+compare1 <- map2(.x = df$sizes, .y = df$names, ~{
+
 ## make a fake, biggish data data frame --------------------------------------
-number_of_rows <- 1E8 #increase this to really test things
+number_of_rows <- .x #increase this to really test things
 
 fake_data <- data.frame(sample(1:100, number_of_rows, replace = TRUE),
                        sample(seq(as.Date('1990/01/01'), as.Date('2010/01/01'), by = "day"),
@@ -74,22 +82,17 @@ compare_filter_summarize <- microbenchmark("dplyr" = {
 compare_filter_summarize
 
 #plot speeds
-p6 <- autoplot(compare_filter_summarize, log = FALSE)
+.y <- autoplot(compare_filter_summarize, log = FALSE) +
+  labs(title = .y)
+})
 
-# boxplot(compare_filter_summarize, log = FALSE,
-#         horizontal = TRUE)
 
 #compare plots
-p1 <- p1 + labs(title = "1 x thousand")
-p2 <- p2 + labs(title = "10 x thousand")
-p3 <- p3 + labs(title = "100 x thousand")
-p4 <- p4 + labs(title = "1 x million")
-p5 <- p5 + labs(title = "10 x million")
-p6 <- p6 + labs(title = "100 x million")
-
-plot <- p1 + p2 + p3 + p4 + p5 + p6
+plot <- compare1[[1]] + compare1[[2]] + compare1[[3]] +
+        compare1[[4]] + compare1[[5]] + compare1[[6]]
 
 ggsave("out/dt-packages_nolog.png", plot)
+
 
 
 ## microbenching case_when ---------------------------------------------------
