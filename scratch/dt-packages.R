@@ -31,10 +31,10 @@ library(patchwork)
 ## FILTER & SUMMARISE  ------------------------------------------------------
 
 ## data sizes to test
-sizes <- c(1E3, 1E4, 1E5, 1E6, 1E7, 1E8)
-names <- c("filter/summarise: 1 x thousand", "filter/summarise: 10 x thousand",
-           "filter/summarise: 100 x thousand", "filter/summarise: 1 x million",
-           "filter/summarise: 10 x million", "filter/summarise: 100 x million")
+sizes <- c(1E3, 1E4, 1E5, 1E6) #, 1E7, 1E8)
+names <- c("1 x thousand:\n1filter/summarise", "10 x thousand:\n1filter/summarise",
+           "100 x thousand:\n1filter/summarise", "1 x million:\n1filter/summarise")
+           # "10 x million:\n1filter/summarise", "100 x million:\n1filter/summarise")
 df <- data.frame(sizes, names)
 
 ## map over data sizes df
@@ -90,7 +90,7 @@ compare_filter_summarize <- microbenchmark("dplyr" = {
 compare_filter_summarize
 
 #plot speeds
-.y <- autoplot(compare_filter_summarize, log = FALSE) +
+.y <- autoplot(compare_filter_summarize) +
   labs(title = .y)
 })
 
@@ -99,10 +99,10 @@ compare_filter_summarize
 ## CASE_WHEN()  --------------------------------------------------------------
 
 ## data sizes to test
-sizes <- c(1E3, 1E4, 1E5, 1E6, 1E7, 1E8)
-names <- c("case_when: 1 x thousand", "case_when: 10 x thousand",
-           "case_when: 100 x thousand", "case_when: 1 x million",
-           "case_when: 10 x million", "case_when: 100 x million")
+sizes <- c(1E3, 1E4, 1E5, 1E6) #, 1E7, 1E8)
+names <- c("1 x thousand:\ncase_when", "10 x thousand:\ncase_when",
+           "100 x thousand:\ncase_when", "1 x million:\ncase_when")
+           # "10 x million:\ncase_when", "100 x million:\ncase_when")
 df <- data.frame(sizes, names)
 
 ## map over data sizes df
@@ -148,8 +148,11 @@ compare_case_when <- microbenchmark("dplyr" = {
     count() %>%
     as_tibble()
 },
-"data.table" = {
+"data.table-match" = {
 fake_data_dt[, new_variable := c("d", "e", "f")[match(some_letter, c("a", "b", "c"))]][, .(n = .N), by = new_variable]
+},
+"data.table-fifelse" = {
+fake_data_dt[, new_variable := fifelse(some_letter == "a", "d", fifelse(some_letter == "b", "e", "f"))][, .(n = .N), by = new_variable]
 },
 "tidyfast" = {
  fake_data %>%
@@ -170,10 +173,10 @@ compare_case_when
 
 ## multiplot and save plots ------------------------------------------------
 plot <- compare1[[1]] + compare1[[2]] + compare1[[3]] +
-        compare1[[4]] + compare1[[5]] + compare1[[6]]
+        compare1[[4]] #+ compare1[[5]] + compare1[[6]]
 
 plot2 <- compare2[[1]] + compare2[[2]] + compare2[[3]] +
-        compare2[[4]] + compare2[[5]] + compare2[[6]]
+        compare2[[4]] #+ compare2[[5]] + compare2[[6]]
 
 ggsave("out/dt_pkgs_filter_summarise.png", plot)
 ggsave("out/dt_pkgs_case_when.png", plot2)
