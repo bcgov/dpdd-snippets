@@ -82,7 +82,7 @@ compare_filter_summarize <- microbenchmark("dplyr" = {
     sum_age = sum(some_number)), by = .(gender, some_letter)]
 },
 "tidydt" = {
-  fake_data_ %>%
+  fake_data_tidydt %>%
   dt_filter(date > as.Date("1999-12-31")) %>%
   dt_summarise(mean_age = mean(some_number), sum_age = sum(some_number),
                by = list(gender, some_letter))
