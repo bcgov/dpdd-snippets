@@ -95,12 +95,6 @@ compare_filter_summarize
 })
 
 
-## compare plots
-plot <- compare1[[1]] + compare1[[2]] + compare1[[3]] +
-        compare1[[4]] + compare1[[5]] + compare1[[6]]
-
-ggsave("out/dt_pkgs_filter_summarise.png", plot)
-
 
 ## CASE_WHEN()  --------------------------------------------------------------
 
@@ -173,10 +167,15 @@ compare_case_when
   labs(title = .y)
 })
 
-#compare plots
+
+## multiplot and save plots ------------------------------------------------
+plot <- compare1[[1]] + compare1[[2]] + compare1[[3]] +
+        compare1[[4]] + compare1[[5]] + compare1[[6]]
+
 plot2 <- compare2[[1]] + compare2[[2]] + compare2[[3]] +
         compare2[[4]] + compare2[[5]] + compare2[[6]]
 
+ggsave("out/dt_pkgs_filter_summarise.png", plot)
 ggsave("out/dt_pkgs_case_when.png", plot2)
 
 
