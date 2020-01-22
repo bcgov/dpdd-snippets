@@ -45,7 +45,7 @@ fd <- fd %>%
 
 
 ## microbenching filter & summarise  ----------------------------------------
-compare_fs <- bench::press(number_of_rows = c(1E3, 1E4, 1E5),
+compare_fs <- bench::press(number_of_rows = c(1E3, 1E4, 1E5, 1E6, 1E7, 1E8),
                            {
                              fake_data <- create_fake_data(number_of_rows)
                              bench::mark(
@@ -92,7 +92,7 @@ plot_fs <- autoplot(compare_fs) +
 
 
 ## microbenching case_when() & equiv  ---------------------------------------
-compare_cw <- bench::press(number_of_rows = c(1E3, 1E4, 1E5),
+compare_cw <- bench::press(number_of_rows = c(1E3, 1E4, 1E5, 1E6, 1E7, 1E8),
                            {
                              fake_data <- create_fake_data(number_of_rows)
                              bench::mark(
