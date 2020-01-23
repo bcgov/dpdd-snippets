@@ -30,13 +30,10 @@ fd <-   data.frame(sample(1:100, number_of_rows, replace = TRUE),
                                   by = "day"), number_of_rows, replace = TRUE),
                        sample(c("male", "female", "unknown"), number_of_rows,
                               replace = TRUE),
-                       sample(c("a", "b", "c"), number_of_rows, replace = TRUE))
+                       sample(c("a", "b", "c"), number_of_rows, replace = TRUE),
+                   stringsAsFactors = FALSE)
 
 colnames(fd) <- c("some_number", "date", "gender", "some_letter")
-
-fd <- fd %>%
-  mutate(some_letter = as.character(some_letter),
-         gender = as.character(gender))
 }
 
 
