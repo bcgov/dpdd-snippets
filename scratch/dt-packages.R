@@ -34,6 +34,7 @@ fd <-   data.frame(sample(1:100, number_of_rows, replace = TRUE),
                    stringsAsFactors = FALSE)
 
 colnames(fd) <- c("some_number", "date", "gender", "some_letter")
+fd
 }
 
 
