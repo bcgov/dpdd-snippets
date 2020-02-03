@@ -51,11 +51,12 @@ ds <- open_dataset("data")
 tic()
 ds %>%
   filter(gender != "unknown",
-         # date > as.Date("2004-12-31"), #crashing rstudio
+         # date > as.Date("2000-01-01"), #crashing rstudio
          some_letter == "c") %>%
+  select(gender, some_number, some_letter) %>%
   group_by(gender) %>%
   collect() %>%
-  summarize(mean_numner = mean(some_number),
+  summarise(mean_number = mean(some_number),
             sum_number = sum(some_number))
 
 toc()
