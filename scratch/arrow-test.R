@@ -26,7 +26,7 @@ library(tictoc)
 ## fake data -----------------------------------------------------------------
 
 ##  make some fake data
-create_fake_data <- function(number_of_rows) {
+# create_fake_data <- function(number_of_rows) {
 # fd <-   data.frame(sample(1:100, number_of_rows, replace = TRUE),
 #                        sample(seq(as.Date('1990-01-01'), as.Date('2010-01-01'),
 #                                   by = "day"), number_of_rows, replace = TRUE),
@@ -63,13 +63,34 @@ toc()
 
 
 
+
 ## reprex  ------------------------------------------------------------
 
+# install.packages("arrow", repos = "https://dl.bintray.com/ursalabs/arrow-r")
+library(dplyr)
+library(arrow) #arrow v0.16
+library(here)
+
+if(!exists(here("tmp"))) dir.create(here("tmp"))
+
+# use shipped parquet data, add date column and write to tmp folder
 read_parquet(system.file("v0.7.1.parquet", package="arrow")) %>%
   dplyr::mutate(date = sample(seq(as.Date('1990-01-01'), as.Date('2010-01-01'),
                                    by = "day"), 10, replace = TRUE)) %>%
-  write_parquet("tmp/parquet_with_date_col.parquet")
+  write_parquet(here("tmp/parquet_with_date_col.parquet"))
 
-read_parquet("tmp/parquet_with_date_col.parquet") %>%
+
+# read and filter file from disk
+read_parquet(here("tmp/parquet_with_date_col.parquet")) %>%
   dplyr::filter(date > as.Date("2000-01-01"))
+
+
+# creat dataset object, filter and collect result
+ds <- open_dataset(here("tmp"))
+
+# crashes RStudio with collect()
+ds %>%
+  dplyr::filter(date > as.Date("2000-01-01")) %>%
+  collect()
+
 
