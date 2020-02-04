@@ -3,7 +3,7 @@
 # dpdd-snippets
 
 
-A home for [R](https://www.r-project.org/) scripts & snippets supporting various [Digital Platforms & Data Division Data Science Team (OCIO) ](https://github.com/orgs/bcgov/teams/dsab) workflows.
+A home for [R](https://www.r-project.org/) scripts & snippets supporting various [Digital Platforms & Data Division Data Science Team (OCIO) ](https://github.com/orgs/bcgov/teams/dsab) workflows or projects.
 
 
 ### Getting Help or Reporting an Issue
