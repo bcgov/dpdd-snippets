@@ -39,9 +39,12 @@ library(tictoc)
 # fd
 # }
 #
-# fd <- create_fake_data(1E3)
-#
+# fd <- create_fake_data(1E8)
+
 # write_parquet(fd, "data/one_hundred_million_rows3.parquet")
+
+
+
 
 
 ## arrow ------------------------------------------------------------
@@ -60,3 +63,7 @@ ds %>%
             sum_number = sum(some_number))
 
 toc()
+
+
+
+
