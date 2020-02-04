@@ -14,8 +14,6 @@
 ## get arrow v0.16 ------------------------------------------------------------
 # install.packages("arrow", repos = "https://dl.bintray.com/ursalabs/arrow-r")
 
-#should be on CRAN in days?
-
 
 ## load libraries ------------------------------------------------------------
 library(dplyr)
