@@ -45,7 +45,7 @@ library(tictoc)
 
 ## arrow ------------------------------------------------------------
 
-ds <- open_dataset("data")
+ds <- open_dataset("data", schema = schema(date = date64()))
 
 tic()
 ds %>%
@@ -60,17 +60,6 @@ ds %>%
 toc()
 
 
-
-
-## reprex  ------------------------------------------------------------
-
-# install.packages("arrow", repos = "https://dl.bintray.com/ursalabs/arrow-r")
-library(dplyr)
-library(arrow) #arrow v0.16
-library(here)
-
-if(!exists(here("tmp"))) dir.create(here("tmp"))
-
 # use shipped parquet data, add date column and write to tmp folder
 read_parquet(system.file("v0.7.1.parquet", package="arrow")) %>%
   dplyr::mutate(date = sample(seq(as.Date('1990-01-01'), as.Date('2010-01-01'),
@@ -79,16 +68,33 @@ read_parquet(system.file("v0.7.1.parquet", package="arrow")) %>%
 
 
 # read and filter file from disk
-read_parquet(here("tmp/parquet_with_date_col.parquet")) %>%
+in.memory <- read_parquet(here("tmp/parquet_with_date_col.parquet")) %>%
   dplyr::filter(date > as.Date("2000-01-01"))
-
 
 # creat dataset object, filter and collect result
 ds <- open_dataset(here("tmp"))
 
-# crashes RStudio with collect()
+
+# run in Terminal R session as this crashes RStudio with collect()
 ds %>%
   dplyr::filter(date > as.Date("2000-01-01")) %>%
   collect()
 
 
+
+## reprex  ------------------------------------------------------------
+
+# install.packages("arrow", repos = "https://dl.bintray.com/ursalabs/arrow-r")
+library(dplyr)
+library(arrow) #arrow v0.16
+
+tmp <- tempfile()
+dir.create(tmp)
+df <- data.frame(date = Sys.Date())
+write_parquet(df, file.path(tmp, "file.parquet"))
+
+ds <- open_dataset(tmp)
+
+ds %>%
+  filter(date > as.Date("2020-02-02")) %>%
+  collect()
