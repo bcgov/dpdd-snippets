@@ -1,0 +1,105 @@
+---
+title: "ICBC Open Data Demo"
+output:
+  html_document:
+    code_folding: hide
+    df_print: paged
+---
+
+An example script for accessing open-licensed ICBC data from [https://public.tableau.com/profile/icbc#!/](https://public.tableau.com/profile/icbc#!/)
+
+```{r setup, include=TRUE, warning=FALSE, message=FALSE}
+
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE)
+
+## load R libraries
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(janitor)
+library(tidyr)
+
+#read in cached data
+vehicle_popn <- read_csv(here::here("data/vehicle_popn.csv"))
+```
+
+#### Read in ICBC open-licensed data from the ICBC Public Tableau Dashboard
+
+```{r get-data, eval=FALSE}
+## get open data 
+
+## ICBC Vehicle Population Data provided under ICBC's Open Data Licence
+## https://public.tableau.com/profile/icbc#!/vizhome/VehiclePopulationIntroPage/VehiclePopulationData
+
+# Note: this url worked once & then bonked, and manual data button greyed out on the webpage
+# maybe hit API limit for the day?
+vehicle_popn <- read_csv("https://public.tableau.com/vizql/w/VehiclePopulation-VehiclePoliciesinForce/v/2015-2019VehiclePoliciesinForce/vudcsv/sessions/221883F691694E43B7A558CDA3955C73-0:0/views/5354432173482926677_9740470209173409196?underlying_table_id=Migrated%20Data&underlying_table_caption=Full%20Data")
+```
+
+
+
+#### Count of `Electric` & `GasolineElectric` Vehicles by Year in B.C.
+
+
+
+```{r, fig.height=4, fig.width=6, fig.align = 'center'}
+#count of electric vehicles by year
+vehicle_popn %>% 
+  clean_names() %>% 
+  filter(fuel_type %in% c("Electric", "GasolineElectric")) %>% 
+  group_by(vehicle_count_year, fuel_type) %>% 
+  summarise(total = sum(vehicle_count)) %>% 
+  ggplot(aes(vehicle_count_year, total, colour = fuel_type)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = "total vehicle count") +
+  theme_minimal() 
+```
+
+
+#### Count of `Electric` + `GasolineElectric` Vehicles by Year for Municipalities
+
+** Plot only includes municipalities with 50 or more `Electric` + `GasolineElectric` Vehicles in 2015
+
+
+```{r, fig.height=10, fig.width=10, fig.align = 'center'}
+##count of electric+gasolinelectric vehicles by year by municipality
+ev_by_mun <- vehicle_popn %>%
+  clean_names() %>%
+  filter(fuel_type %in% c("Electric", "GasolineElectric")) %>%
+  group_by(vehicle_count_year, municipality) %>%
+  summarise(total = sum(vehicle_count)) %>%
+  ungroup() %>%
+  complete(municipality, vehicle_count_year = 2015:2019,
+             fill = list(total = 0)) 
+
+
+##plot only municipalities where total = or > 100 in 2015
+mun_filter <- ev_by_mun %>% 
+  filter(total > 50 & vehicle_count_year == 2015) %>% 
+  distinct(municipality) %>% 
+  pull()
+
+ev_by_mun_subset <- ev_by_mun %>% 
+  filter(municipality %in% mun_filter) 
+
+# generate the plot order based on highest values in most recent year
+plot.order <- ev_by_mun_subset %>%
+  filter(vehicle_count_year == "2019") %>%
+  arrange(desc(total)) %>%
+  pull(municipality)
+
+
+ev_by_mun_subset$municipality = factor(ev_by_mun_subset$municipality, 
+                                           levels = plot.order)
+
+ev_by_mun_subset%>% 
+  ggplot(aes(vehicle_count_year , total)) +
+  geom_line() +
+  geom_point() +
+  facet_wrap(facets = vars(municipality)) +
+  labs(x = NULL, y = "total vehicle count") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(size = 5))
+```
+
