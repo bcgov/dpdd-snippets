@@ -18,12 +18,31 @@ library(dplyr)
 library(ggplot2)
 library(janitor)
 library(tidyr)
+library(bcdata)
 
 #read in cached data
-vehicle_popn <- read_csv(here::here("data/vehicle_popn.csv"))
+vehicle_popn <- read_csv(here::here("data/vehicle_popn.csv")) %>% 
+    clean_names()
+
+bc_muni <- bcdc_query_geodata('e3c3c580-996a-4668-8bc5-6aa7c7dc4932') %>%
+  select(ADMIN_AREA_ABBREVIATION, ADMIN_AREA_GROUP_NAME) %>%
+  collect() %>%
+  select(ADMIN_AREA_ABBREVIATION, ADMIN_AREA_GROUP_NAME) %>%
+  clean_names() %>% 
+  sf::st_drop_geometry() %>% 
+  mutate(admin_area_abbreviation = gsub(" - District| - City", "", admin_area_abbreviation)) %>% 
+  distinct()
 ```
 
 #### Read in ICBC open-licensed data from the ICBC Public Tableau Dashboard
+
+To download the open data from ICBC, you need to navigate their tableau interface. This approach has worked to download a csv file locally:
+
+- Navigate to this page: https://public.tableau.com/profile/icbc#!/vizhome/VehiclePopulation-VehiclePoliciesinForce/2015-2019VehiclePoliciesinForce
+- A new page will open with something that looks like a spreadsheet. Scroll to the bottom of the spreadsheet and click on the download icon.
+- A box will pop up asking you whice file format you would like. Click on `Data`.
+- This will open a new window with a `Summary` and `Full Data` tab. Click on `Full Data`.
+- On the `Full Data` tab click on `Download all rows as a text file` and you given the option to download the data to your machine. 
 
 ```{r get-data, eval=FALSE}
 ## get open data 
@@ -33,7 +52,8 @@ vehicle_popn <- read_csv(here::here("data/vehicle_popn.csv"))
 
 # Note: this url worked once & then bonked, and manual data button greyed out on the webpage
 # maybe hit API limit for the day?
-vehicle_popn <- read_csv("https://public.tableau.com/vizql/w/VehiclePopulation-VehiclePoliciesinForce/v/2015-2019VehiclePoliciesinForce/vudcsv/sessions/221883F691694E43B7A558CDA3955C73-0:0/views/5354432173482926677_9740470209173409196?underlying_table_id=Migrated%20Data&underlying_table_caption=Full%20Data")
+vehicle_popn <- read_csv("https://public.tableau.com/vizql/w/VehiclePopulation-VehiclePoliciesinForce/v/2015-2019VehiclePoliciesinForce/vudcsv/sessions/F921B0B6D90D473BA3D18354807F39E3-0:0/views/5354432173482926677_9740470209173409196?underlying_table_id=Migrated%20Data&underlying_table_caption=Full%20Data") %>% 
+    clean_names()
 ```
 
 
@@ -45,10 +65,9 @@ vehicle_popn <- read_csv("https://public.tableau.com/vizql/w/VehiclePopulation-V
 ```{r, fig.height=4, fig.width=6, fig.align = 'center'}
 #count of electric vehicles by year
 vehicle_popn %>% 
-  clean_names() %>% 
   filter(fuel_type %in% c("Electric", "GasolineElectric")) %>% 
   group_by(vehicle_count_year, fuel_type) %>% 
-  summarise(total = sum(vehicle_count)) %>% 
+  summarise(total = sum(vehicle_count), .groups = "drop") %>% 
   ggplot(aes(vehicle_count_year, total, colour = fuel_type)) +
   geom_line() +
   geom_point() +
@@ -65,24 +84,23 @@ vehicle_popn %>%
 ```{r, fig.height=10, fig.width=10, fig.align = 'center'}
 ##count of electric+gasolinelectric vehicles by year by municipality
 ev_by_mun <- vehicle_popn %>%
-  clean_names() %>%
   filter(fuel_type %in% c("Electric", "GasolineElectric")) %>%
   group_by(vehicle_count_year, municipality) %>%
-  summarise(total = sum(vehicle_count)) %>%
-  ungroup() %>%
+  summarise(total = sum(vehicle_count), .groups = "drop") %>%
   complete(municipality, vehicle_count_year = 2015:2019,
              fill = list(total = 0)) 
 
 
 ##plot only municipalities where total = or > 100 in 2015
 mun_filter <- ev_by_mun %>% 
-  filter(total > 50 & vehicle_count_year == 2015) %>% 
+  filter(total >= 50 & vehicle_count_year == 2015) %>% 
   distinct(municipality) %>% 
   pull()
 
 ev_by_mun_subset <- ev_by_mun %>% 
-  filter(municipality %in% mun_filter) 
-
+  filter(municipality %in% mun_filter) %>%  
+  left_join(bc_muni, by = c("municipality" = "admin_area_abbreviation"))
+  
 # generate the plot order based on highest values in most recent year
 plot.order <- ev_by_mun_subset %>%
   filter(vehicle_count_year == "2019") %>%
@@ -93,7 +111,7 @@ plot.order <- ev_by_mun_subset %>%
 ev_by_mun_subset$municipality = factor(ev_by_mun_subset$municipality, 
                                            levels = plot.order)
 
-ev_by_mun_subset%>% 
+ev_by_mun_subset %>% 
   ggplot(aes(vehicle_count_year , total)) +
   geom_line() +
   geom_point() +
@@ -102,4 +120,6 @@ ev_by_mun_subset%>%
   theme_minimal() +
   theme(axis.text.x = element_text(size = 5))
 ```
+
+
 
