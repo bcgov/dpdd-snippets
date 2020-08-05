@@ -36,13 +36,13 @@ bc_muni <- bcdc_query_geodata('e3c3c580-996a-4668-8bc5-6aa7c7dc4932') %>%
 
 #### Read in ICBC open-licensed data from the ICBC Public Tableau Dashboard
 
-To download the open data from ICBC, you need to navigate their tableau interface. This approach has worked to download a csv file locally:
+To download the open data from ICBC, you need to navigate their Tableau interface. This approach has worked to download a CSV file locally:
 
 - Navigate to this page: https://public.tableau.com/profile/icbc#!/vizhome/VehiclePopulation-VehiclePoliciesinForce/2015-2019VehiclePoliciesinForce
-- A new page will open with something that looks like a spreadsheet. Scroll to the bottom of the spreadsheet and click on the download icon.
-- A box will pop up asking you whice file format you would like. Click on `Data`.
-- This will open a new window with a `Summary` and `Full Data` tab. Click on `Full Data`.
-- On the `Full Data` tab click on `Download all rows as a text file` and you given the option to download the data to your machine. 
+- A new page will open with something that looks like a spreadsheet. Scroll to the bottom of the spreadsheet and click on the download icon
+- A box will pop up asking you which file format you would like, click on `Data`
+- This will open a new window with a `Summary` and `Full Data` tab, click on `Full Data`
+- On the `Full Data` tab click on `Download all rows as a text file` and you will be given the option to download the data locally to your machine
 
 ```{r get-data, eval=FALSE}
 ## get open data 
