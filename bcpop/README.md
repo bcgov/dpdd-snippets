@@ -21,6 +21,7 @@ This folder contains an R script for looking at and comparing population size an
 #### Data
 
  - B.C. population estimates by Local Health Authority were sourced manually from BCStats ShinyApp [https://bcstats.shinyapps.io/popApp/](https://bcstats.shinyapps.io/popApp/) and saved locally in `/data`
- - B.C. population estimates by Census Subdivision were sourced from Statistics Canada ([Table: 17-10-0005-01](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1710000501&pickMembers%5B0%5D=1.11&pickMembers%5B1%5D=2.1&cubeTimeFrame.startYear=2010&cubeTimeFrame.endYear=2020&referencePeriods=20100101%2C20200101) using the [{cansim}](https://mountainmath.github.io/cansim/index.html) R package
+ - B.C. population estimates, totals and by Census Division and Census Subdivision, were sourced from Statistics Canada using the [{cansim}](https://mountainmath.github.io/cansim/index.html) R package (Tables [17-10-0005-01](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1710000501), [17-10-0139-01](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1710013901) and [17-10-0142-01](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1710014201)).
+
 
 
