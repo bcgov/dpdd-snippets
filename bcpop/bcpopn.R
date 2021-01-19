@@ -18,6 +18,7 @@ library(dplyr)
 library(ggplot2)
 library(scales)
 library(tidyr)
+library(stringr)
 
 
 ## get data --------------------------------------------------------------------
@@ -49,23 +50,24 @@ bcpop_tot <- bcpop_raw %>%
   filter(geo == "British Columbia",
          sex == "Both sexes",
          age_group == "All ages") %>%
-  select(ref_date, geo, sex, age_group, value)
+  select(year = ref_date, geo, sex, age_group, value)
 
 bcpop_tot_cddata <- bcpop_cd_raw %>%
   filter(geo == "British Columbia",
          sex == "Both sexes",
          age_group == "All ages") %>%
-  select(ref_date, geo, sex, age_group, value)
+  select(year = ref_date, geo, sex, age_group, value)
 
 bcpop_tot_csddata <- bcpop_csd_raw %>%
   filter(geo_uid == "59") %>%
-  select(ref_date, geo, value)
+  select(year = ref_date, geo, value)
 
 bcpop_tot_lhadata <- bcpop_lha_raw %>%
   filter(region == "0",
          gender == "T") %>%
-  select(local_health_area, year, total)
+  select(year, local_health_area, total)
 
+#qa/qc check
 if(bcpop_tot_lhadata %>%
    filter(year == "2019") %>%
    pull() != bcpop_tot_csddata %>%
@@ -75,6 +77,7 @@ if(bcpop_tot_lhadata %>%
 
 ## tidy data -------------------------------------------------------------------
 
+#bcstats LHA data
 bcpop_lha_all <- bcpop_lha_raw %>%
   mutate(age_0_to_14 = rowSums(across(x0:x14), na.rm = T),
          age_15_to_24 = rowSums(across(x15:x24), na.rm = T),
@@ -93,10 +96,52 @@ bcpop_lha_all <- bcpop_lha_raw %>%
   # mutate(pop_change = estimate - lag(estimate),
   # pop_change_percent = estimate / lag(estimate) - 1)
 
-bcpop_lha <- bcpop_lha_all %>%
-  filter(local_health_area != "British Columbia")
+
+#statscan cd data
+bcpop_cd <- bcpop_cd_raw %>%
+  filter(
+    geo != "British Columbia",
+    str_starts(geo_uid, "59")
+    ) %>%
+  mutate(geo = str_remove(geo, ", British Columbia")) %>%
+  filter(!age_group %in% c("All ages", "Median age", "Average age", "65 years and older")) %>%
+  filter(!grepl(" to ", age_group)) %>%
+  mutate(age_group = trimws(gsub('years|year|and older', '', age_group))) %>%
+  mutate(age_group = as.numeric(age_group)) %>%  ## THIS NEEDS TO GENERATE NO WARNINGS
+  mutate(age_group = case_when(
+    between(age_group, 0, 14) ~ "age_0_to_14",
+    between(age_group, 15, 24) ~ "age_15_to_24",
+    between(age_group, 25, 54) ~ "age_25_to_54",
+    age_group >= 55 ~ "age_55_plus")) %>%
+  group_by(ref_date, geo, geo_uid, sex, age_group) %>%
+  summarise(value = sum(value)) %>%
+  select(year = ref_date, geo, geo_uid, sex, age_group, value)
+
+#qa/qc check
+if(bcpop_cd %>% filter(year == "2020",
+                       sex == "Both sexes") %>%
+   group_by(year) %>%
+   summarise(sum(value)) %>%
+   pull() != bcpop_tot_cddata %>%
+   filter(year == "2020") %>%
+   pull(value)) stop("Totals don't add up")
 
 
+#statscan csd data
+bcpop_csd <- bcpop_csd_raw %>%
+  filter(geo != "British Columbia",
+         str_starts(geo_uid, "59")) %>%
+   mutate(geo = str_remove(geo, ", British Columbia")) %>%
+   select(year = ref_date, geo, geo_uid, value)
+
+#qa/qc check
+if(bcpop_csd %>%
+   filter(year == "2020") %>%
+   group_by(year) %>%
+   summarise(sum(value)) %>%
+   pull()  != bcpop_tot_cddata %>%
+   filter(year == "2020") %>%
+   pull(value)) stop("Totals don't add up")
 
 
 ## bcpop change by LHA  --------------------------------------------------------
