@@ -155,12 +155,8 @@ bcpop_tot_lhadata %>%
   pull(change_percent) %>%
   percent()
 
+
 ## regional totals by gender & year --------------------------------------------
-
-
-
-
-
 
 bcpop_lha %>%
    filter(region != "0",
