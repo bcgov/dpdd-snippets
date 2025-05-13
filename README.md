@@ -1,4 +1,4 @@
-[![img](https://img.shields.io/badge/Lifecycle-Maturing-007EC6)](https://github.com/bcgov/repomountie/blob/master/doc/lifecycle-badges.md)
+[![Lifecycle:Retired](https://img.shields.io/badge/Lifecycle-Retired-d45500)](https://github.com/bcgov/repomountie/blob/master/doc/lifecycle-badges.md)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 # dpdd-snippets
@@ -6,6 +6,7 @@
 
 A home for [R](https://www.r-project.org/) scripts & snippets supporting various [Digital Platforms & Data Division Data Science Team (OCIO) ](https://github.com/orgs/bcgov/teams/dsab) workflows or projects.
 
+_This documentation repository has been **RETIRED** and is not being maintained._
 
 ### Getting Help or Reporting an Issue
 
